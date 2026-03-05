@@ -9,41 +9,42 @@ The aim of this study is to investigate patterns of hybridization, admixture, an
 The repository provides all scripts necessary to reproduce the analyses and figures presented in the manuscript.
 
 ---
+## Repository structure
 
-# Repository structure
+```
 ├── data_processing
-│ ├── read_filtering
-│ ├── alignment
-│ └── variant_calling
+│   ├── read_filtering
+│   ├── alignment
+│   └── variant_calling
 │
 ├── snp_datasets
-│ ├── shared_snps
-│ ├── combined_haploid_diploid
-│ ├── haploid_dataset
-│ └── diploid_dataset
+│   ├── shared_snps
+│   ├── combined_haploid_diploid
+│   ├── haploid_dataset
+│   └── diploid_dataset
 │
 ├── population_structure
-│ ├── PCA
-│ └── ancestry_inference
+│   ├── PCA
+│   └── ancestry_inference
 │
 ├── haplotype_analyses
-│ ├── phasing
-│ ├── chromopainter
-│ ├── coancestry_matrices
-│ └── ancestry_networks
+│   ├── phasing
+│   ├── chromopainter
+│   ├── coancestry_matrices
+│   └── ancestry_networks
 │
 ├── admixture_analyses
-│ ├── globetrotter
-│ └── treemix
+│   ├── globetrotter
+│   └── treemix
 │
 ├── genome_scans
-│ └── fst_analyses
+│   └── fst_analyses
 │
 ├── figures
-│ └── scripts_for_figure_generation
+│   └── scripts_for_figure_generation
 │
 └── README.md
-
+```
 ---
 
 # Analytical workflow
