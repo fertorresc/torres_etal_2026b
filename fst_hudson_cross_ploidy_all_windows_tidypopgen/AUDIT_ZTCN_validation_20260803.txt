@@ -1,0 +1,36 @@
+VALIDACIÓN DE REASIGNACIÓN ZTCN — 2026-08-03
+
+Fuente primaria: lista explícita entregada por la usuaria y PopMap_DIP.txt.
+
+Resultado de comparación con las tablas del paquete:
+- Coincidencia exacta individuo por individuo: SÍ.
+- HAP QCZ-like -> QCZ: 16.
+- HAP RIT-like -> RIT: 14.
+- HAP excluidos: 0.
+- DIP QCZ-like -> QCZ: 2.
+- DIP RIT-like -> RIT: 20.
+- DIP excluidos: 9.
+
+Auditoría PopMap_DIP.txt:
+- Total de individuos: 90.
+- ZTCN_DIP originales: 31.
+- QCZ_DIP originales: 3; después de reasignación: 5.
+- RIT_DIP originales: 3; después de reasignación: 23.
+- ZTCN diploides excluidos del contraste QCZ–RIT: 9.
+
+Individuos diploides excluidos:
+- ZTCN03N_13_Diploid
+- ZTCN03N_15_Diploid
+- ZTCN03S_12_Diploid
+- ZTCN03S_13_Diploid
+- ZTCN03S_15_Diploid
+- ZTCN_para_17_Diploid
+- ZTCN_para_19_Diploid
+- ZTCN_para_22_Diploid
+- ZTCN_para_23_Diploid
+
+Regla aplicada por el script:
+- Los ZTCN QCZ-like se recodifican como QCZ.
+- Los ZTCN RIT-like se recodifican como RIT.
+- Todo ZTCN no incluido en esas categorías queda fuera del contraste QCZ–RIT.
+- STRICT_ZTCN_ASSIGNMENT = TRUE obliga a que todos los ZTCN del popmap tengan una fila en la tabla de asignación.
