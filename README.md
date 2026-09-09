@@ -1,115 +1,91 @@
-# Genomic analyses of hybridization and admixture in *Mazzaella laminarioides*
+# Hudson FST cruzado: mismas regiones en haploides y diploides
 
-This repository contains the scripts and workflows used in the study:
+## Objetivo
 
-**"[Title of the manuscript]"**
+Este paquete implementa la comparación solicitada: **cada región candidata de diemPy se calcula en HAP y en DIP usando exactamente las mismas coordenadas**, aunque diemPy la haya detectado originalmente en una sola ploidía.
 
-The aim of this study is to investigate patterns of hybridization, admixture, and population structure among three cryptic lineages of the red alga *Mazzaella laminarioides* distributed along the Chilean coast. Using genome-wide SNP data from 182 individuals (81 haploids and 91 diploids), the analyses combine population genomic and haplotype-based approaches to infer ancestry structure, gene flow, and admixture dynamics across the species’ geographic range.
+Para cada región y ploidía se calcula:
 
-The repository provides all scripts necessary to reproduce the analyses and figures presented in the manuscript.
+- `fst_block_Hudson`: Hudson FST dentro de la región focal.
+- `fst_contig_background_Hudson`: Hudson FST en el mismo contig, excluyendo solamente la región focal.
+- `delta_fst_block_minus_background = fst_block_Hudson - fst_contig_background_Hudson`.
 
----
-## Repository structure
+Se utilizan todos los individuos de las dos poblaciones del contraste local; no se restringe a carriers. Los valores negativos de FST se conservan.
 
+## Dos conjuntos de análisis
+
+### 1. EXACT_WINDOWS
+
+Conserva las 35 coordenadas originales de la tabla de candidatos. Cada una se calcula en HAP y DIP. Produce 70 filas en formato largo.
+
+Este conjunto evita modificar las fronteras originales y sirve como auditoría/sensibilidad a los límites de los bloques.
+
+### 2. HARMONIZED_REGIONS
+
+Fusiona únicamente intervalos que se solapan en el mismo contig y para la misma comparación poblacional. La coordenada común es la unión del intervalo HAP y DIP. Con los insumos incluidos se obtienen 29 regiones:
+
+- 15 detectadas solo en HAP.
+- 8 detectadas solo en DIP.
+- 6 detectadas en ambas ploidías.
+
+Este conjunto es el recomendado para la figura principal porque cada fila representa una sola región genómica y HAP/DIP quedan perfectamente alineados.
+
+## Comparaciones poblacionales
+
+- QCZ–RIT para candidatos de QCZ/RIT/ZTCN-like.
+- LLI–CVG para candidatos de LLI/CVG.
+- LIL–LOB para candidatos de LIL/LOB.
+
+La reasignación validada de ZTCN se mantiene sin cambios respecto de la versión 3.
+
+## Ejecución
+
+Descomprimir dentro del directorio de análisis y ejecutar:
+
+```bash
+cd /media/server/a77f75fe-fd07-402e-84d7-a7341c29141c1/fertorres/segundo_capitulo/integration_analyses/Julio
+unzip fst_hudson_cross_ploidy_all_windows_tidypopgen_package_v4.zip
+bash fst_hudson_cross_ploidy_all_windows_tidypopgen_package_v4/run_fst_hudson_cross_ploidy.sh
 ```
-├── data_processing
-│   ├── read_filtering
-│   ├── alignment
-│   └── variant_calling
-│
-├── snp_datasets
-│   ├── shared_snps
-│   ├── combined_haploid_diploid
-│   ├── haploid_dataset
-│   └── diploid_dataset
-│
-├── population_structure
-│   ├── PCA
-│   └── ancestry_inference
-│
-├── haplotype_analyses
-│   ├── phasing
-│   ├── chromopainter
-│   ├── coancestry_matrices
-│   └── ancestry_networks
-│
-├── admixture_analyses
-│   ├── globetrotter
-│   └── treemix
-│
-├── genome_scans
-│   └── fst_analyses
-│
-├── figures
-│   └── scripts_for_figure_generation
-│
-└── README.md
+
+Para cambiar el número de núcleos:
+
+```bash
+FST_N_CORES=20 bash fst_hudson_cross_ploidy_all_windows_tidypopgen_package_v4/run_fst_hudson_cross_ploidy.sh
 ```
----
 
-# Analytical workflow
+## Insumo externo requerido
 
-The analyses performed in this study follow the workflow described below.
+```text
+/media/server/a77f75fe-fd07-402e-84d7-a7341c29141c1/fertorres/segundo_capitulo/integration_analyses/Julio/vcf_maf_md_100kpb_contigs_pseudodip.vcf.gz
+```
 
-### 1. Read processing and alignment
+## Requisitos
 
-Raw sequencing reads were quality-filtered and aligned to the *Mazzaella laminarioides* reference genome using **BWA-MEM**. Resulting alignments were processed to generate sorted BAM files for variant discovery.
+- Rscript.
+- tidypopgen 0.4.4.
+- dplyr.
+- tibble.
 
-### 2. Variant discovery
+## Salidas principales
 
-Single nucleotide polymorphisms (SNPs) were identified following best-practice pipelines. SNP filtering included:
+Se crea `FST_Hudson_cross_ploidy_all_windows_tidypopgen/run_YYYYMMDD_HHMMSS/`.
 
-- genotype quality filtering
-- read depth thresholds
-- missing data filtering
-- minor allele frequency filtering
-- removal of artefactual variants
+- `analysis_regions_EXACT_WINDOWS.tsv`
+- `FST_Hudson_EXACT_WINDOWS_LONG.tsv`
+- `FST_Hudson_EXACT_WINDOWS_WIDE.tsv`
+- `analysis_regions_HARMONIZED_REGIONS.tsv`
+- `FST_Hudson_HARMONIZED_REGIONS_LONG.tsv`
+- `FST_Hudson_HARMONIZED_REGIONS_WIDE.tsv`
+- `FST_Hudson_HARMONIZED_REGIONS_HAP_DIP_aligned.png`
+- `candidate_detection_summary.tsv`
+- `fst_phase_pattern_summary.tsv`
+- archivos de auditoría, parámetros, sesión y log.
 
-### 3. SNP dataset construction
+## Interpretación
 
-Multiple SNP datasets were generated from the filtered variant matrix to accommodate different analytical requirements:
+- `delta < 0`: la región tiene menor diferenciación que el resto de su contig.
+- `delta ≈ 0`: no existe una desviación local clara respecto del contig.
+- `delta > 0`: la región está más diferenciada que el resto del contig.
 
-- **Genome-wide shared SNP dataset**  
-  SNPs shared between haploid and diploid individuals for direct comparison across life-cycle stages.
-
-- **Combined haploid–diploid dataset**  
-  Joint dataset used for population structure analyses.
-
-- **Ploidy-specific datasets**  
-  Separate SNP matrices for haploid and diploid individuals.
-
-- **Haplotype-based dataset**  
-  SNPs located within the 11 largest contigs (>600 kb) used for haplotype-based analyses.
-
-### 4. Population genomic structure
-
-Population structure was investigated using:
-
-- **Principal Component Analysis (PCA)**
-- **Ancestry inference using sparse non-negative matrix factorization**
-
-### 5. Haplotype-based analyses
-
-Genotypes were phased using **BEAGLE** and analysed using:
-
-- **ChromoPainter** for haplotype painting
-- coancestry matrices to quantify haplotype sharing
-- ancestry networks based on haplotype similarity
-
-### 6. Admixture inference
-
-Admixture among populations was analysed using:
-
-- **GLOBETROTTER** to detect and date admixture events
-- **TreeMix** to infer historical migration among populations
-
-### 7. Genome-wide differentiation
-
-Genome-wide differentiation was quantified using **FST scans** calculated in sliding windows across the genome.
-
----
-
-# Data availability
-
-Raw sequencing data are available in the **NCBI Sequence Read Archive (SRA)** under BioProject:
-Large intermediate files (VCF files, ChromoPainter outputs, etc.) are not included in this repository due to file size limitations but are available at:
+La comparación es descriptiva. No es por sí sola una prueba formal de introgresión ni de significancia. Para una prueba formal se requiere un fondo nulo empírico con segmentos del mismo contig igualados por longitud, número de SNPs y, idealmente, propiedades de diversidad/missingness.
