@@ -1,9 +1,0 @@
-package: fst_hudson_cross_ploidy_all_windows_tidypopgen_package
-version: 4.0.0
-created: 2026-08-06
-fst_estimator: Hudson
-required_tidypopgen: 0.4.4
-design: all candidate intervals evaluated independently in HAP and DIP
-region_sets: EXACT_WINDOWS and HARMONIZED_REGIONS
-background: same contig excluding only focal analysis interval
-population_scope: all individuals in each population
